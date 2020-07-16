@@ -1,0 +1,161 @@
+mysql: [Warning] E:\MySQL Server\bin\mysql.exe: ignoring option '--no-beep' due to invalid value ''.
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 8.0.20 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| foodordersystem    |
+| footballteamplayer |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| test1              |
+| world              |
++--------------------+
+9 rows in set (0.00 sec)
+
+mysql> use foodordersystem;
+Database changed
+mysql> show tables;
++---------------------------+
+| Tables_in_foodordersystem |
++---------------------------+
+| food                      |
+| menu                      |
+| orders                    |
++---------------------------+
+3 rows in set (0.01 sec)
+
+mysql> desc food;
++---------+---------------+------+-----+---------+-------+
+| Field   | Type          | Null | Key | Default | Extra |
++---------+---------------+------+-----+---------+-------+
+| id      | varchar(12)   | NO   | PRI | NULL    |       |
+| name    | varchar(20)   | NO   | UNI | NULL    |       |
+| price   | decimal(21,5) | NO   |     | NULL    |       |
+| menu_id | varchar(12)   | YES  |     | NULL    |       |
++---------+---------------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+mysql> desc menu;
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| id          | varchar(12) | NO   | PRI | NULL    |       |
+| name        | varchar(20) | NO   |     | NULL    |       |
+| description | varchar(20) | NO   |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+mysql> desc orders;
++------------+---------------+------+-----+---------+-------+
+| Field      | Type          | Null | Key | Default | Extra |
++------------+---------------+------+-----+---------+-------+
+| id         | varchar(12)   | NO   |     | NULL    |       |
+| sale_date  | date          | YES  |     | NULL    |       |
+| qty        | int           | YES  |     | NULL    |       |
+| foodid     | varchar(12)   | YES  |     | NULL    |       |
+| price      | decimal(21,5) | YES  |     | NULL    |       |
+| totalprice | decimal(21,5) | YES  |     | NULL    |       |
++------------+---------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> select * from menu;
++----+---------+-------------+
+| id | name    | description |
++----+---------+-------------+
+| M1 | Beers   | Good        |
+| M2 | Juices  | Moderate    |
+| M3 | Noodels | Good        |
+| M4 | Salad   | Moderate    |
++----+---------+-------------+
+4 rows in set (0.00 sec)
+
+mysql> select * from food;
++----+------------------+------------+---------+
+| id | name             | price      | menu_id |
++----+------------------+------------+---------+
+| F1 | Tiger            | 1800.00000 | M1      |
+| F2 | Super-easy Greek | 1200.00000 | M4      |
+| F3 | Chicken Salad    | 1300.00000 | M4      |
+| F4 | Mango Salad      | 1000.00000 | M4      |
+| F5 | Chicken          | 1500.00000 | M3      |
+| F6 | Goat Noodel      | 1600.00000 | M3      |
+| F7 | Orange           | 1000.00000 | M2      |
+| F8 | Banana           |  800.00000 | M2      |
+| F9 | Black Shield     | 1800.00000 | M1      |
++----+------------------+------------+---------+
+9 rows in set (0.00 sec)
+
+mysql> select * from orders;
++-----+------------+------+--------+------------+-------------+
+| id  | sale_date  | qty  | foodid | price      | totalprice  |
++-----+------------+------+--------+------------+-------------+
+| O1  | 2020-05-21 |   12 | F3     | 1300.00000 | 26000.00000 |
+| O2  | 2020-05-23 |    4 | F3     | 1300.00000 |  4200.00000 |
+| O3  | 2020-06-02 |    2 | F1     | 1800.00000 |  3200.00000 |
+| O4  | 2020-06-05 |    3 | F2     | 1200.00000 |  3600.00000 |
+| O5  | 2020-06-12 |    2 | F2     | 1200.00000 |  2400.00000 |
+| O6  | 2020-07-01 |    1 | F9     | 1800.00000 |  1800.00000 |
+| O7  | 2020-07-05 |    2 | F6     | 1600.00000 |  3200.00000 |
+| O8  | 2020-07-12 |    4 | F8     |  800.00000 |  3200.00000 |
+| O9  | 2020-07-16 |    3 | F7     | 1000.00000 |  3000.00000 |
+| O10 | 2020-07-17 |    3 | F7     | 1000.00000 |  3000.00000 |
++-----+------------+------+--------+------------+-------------+
+10 rows in set (0.00 sec)
+
+mysql> select food.name,orders.totalprice from orders,food where orders.foodid=food.id and totalprice in(select max(totalprice) from orders);
++---------------+-------------+
+| name          | totalprice  |
++---------------+-------------+
+| Chicken Salad | 26000.00000 |
++---------------+-------------+
+1 row in set (0.11 sec)
+
+mysql>  select food.name,orders.totalprice from orders,food where orders.foodid=food.id and totalprice in(select min(totalprice) from orders);
++--------------+------------+
+| name         | totalprice |
++--------------+------------+
+| Black Shield | 1800.00000 |
++--------------+------------+
+1 row in set (0.00 sec)
+
+mysql> select orders.sale_date,sum(totalprice) as total_amount from orders group by sale_date;
++------------+--------------+
+| sale_date  | total_amount |
++------------+--------------+
+| 2020-05-21 |  26000.00000 |
+| 2020-05-23 |   4200.00000 |
+| 2020-06-02 |   3200.00000 |
+| 2020-06-05 |   3600.00000 |
+| 2020-06-12 |   2400.00000 |
+| 2020-07-01 |   1800.00000 |
+| 2020-07-05 |   3200.00000 |
+| 2020-07-12 |   3200.00000 |
+| 2020-07-16 |   3000.00000 |
+| 2020-07-17 |   3000.00000 |
++------------+--------------+
+10 rows in set (0.04 sec)
+
+mysql> select sum(totalprice) from orders where sale_date between '2020.5.20' and '2020.7.12';
++-----------------+
+| sum(totalprice) |
++-----------------+
+|     47600.00000 |
++-----------------+
+1 row in set (0.06 sec)
+
