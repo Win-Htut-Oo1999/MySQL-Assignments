@@ -1,0 +1,179 @@
+mysql: [Warning] E:\MySQL Server\bin\mysql.exe: ignoring option '--no-beep' due to invalid value ''.
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 10
+Server version: 8.0.20 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2020, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| footballteamplayer |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sakila             |
+| sys                |
+| test1              |
+| world              |
++--------------------+
+8 rows in set (3.93 sec)
+
+mysql> use footballteamplayer;
+Database changed
+mysql> show tables;
++------------------------------+
+| Tables_in_footballteamplayer |
++------------------------------+
+| player                       |
+| team                         |
++------------------------------+
+2 rows in set (1.00 sec)
+
+mysql> select * from player;
++------+---------------------+---------+------+-------------+---------+--------+
+| id   | name                | jersyno | age  | salary      | team_id | height |
++------+---------------------+---------+------+-------------+---------+--------+
+|    1 | Christiano Ronaldo  |       7 |   36 | 12000000.00 |       8 | 6      |
+|    2 | Lionel Messi        |      10 |   35 | 14000000.00 |       8 | 6.5    |
+|    3 | Marcelo             |      13 |   27 | 10000000.00 |       9 | 6      |
+|    4 | Eden Hazard         |      23 |   30 |  7000000.00 |       5 | 5.10   |
+|    5 | Mohamed Salah       |      17 |   26 |  6000000.00 |       4 | 5.8    |
+|    6 | David De Gra        |       9 |   35 | 10000000.00 |       1 | 6.2    |
+|    7 | Alexis Sanchez      |      12 |   30 |  9000000.00 |       2 | 5.9    |
+|    8 | Gabriel Jesus       |      20 |   32 |   600000.00 |       1 | 5.10   |
+|    9 | Yerry Fernando Mina |      13 |   32 |  4000000.00 |       3 | 6      |
+|   10 | Lucas Digne         |      12 |   30 |   120000.00 |       3 | 5.8    |
+|   11 | Marcos Alonso       |       3 |   30 |   300000.00 |       5 | 5.8    |
++------+---------------------+---------+------+-------------+---------+--------+
+11 rows in set (0.28 sec)
+
+mysql> select * from team;
++----+-------------------+-------------+
+| id | name              | foundeddate |
++----+-------------------+-------------+
+|  1 | Manchester United | 1895-05-20  |
+|  2 | Arsenal           | 1886-10-23  |
+|  3 | Everton           | 1878-10-16  |
+|  4 | Liverpool         | 1892-03-15  |
+|  5 | Chelsea           | 1905-03-10  |
+|  6 | Brentford         | 1889-10-10  |
+|  7 | Aston Villa       | 1874-11-21  |
+|  8 | Bercelona         | 1899-10-23  |
+|  9 | Real Madrid       | 1902-03-06  |
++----+-------------------+-------------+
+9 rows in set (0.10 sec)
+
+mysql> select * from where team_id=8;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'where team_id=8' at line 1
+mysql> select * from Player where team_id=8;
++------+--------------------+---------+------+-------------+---------+--------+
+| id   | name               | jersyno | age  | salary      | team_id | height |
++------+--------------------+---------+------+-------------+---------+--------+
+|    1 | Christiano Ronaldo |       7 |   36 | 12000000.00 |       8 | 6      |
+|    2 | Lionel Messi       |      10 |   35 | 14000000.00 |       8 | 6.5    |
++------+--------------------+---------+------+-------------+---------+--------+
+2 rows in set (0.05 sec)
+
+mysql> select * from Player where salary>8000000.00;
++------+--------------------+---------+------+-------------+---------+--------+
+| id   | name               | jersyno | age  | salary      | team_id | height |
++------+--------------------+---------+------+-------------+---------+--------+
+|    1 | Christiano Ronaldo |       7 |   36 | 12000000.00 |       8 | 6      |
+|    2 | Lionel Messi       |      10 |   35 | 14000000.00 |       8 | 6.5    |
+|    3 | Marcelo            |      13 |   27 | 10000000.00 |       9 | 6      |
+|    6 | David De Gra       |       9 |   35 | 10000000.00 |       1 | 6.2    |
+|    7 | Alexis Sanchez     |      12 |   30 |  9000000.00 |       2 | 5.9    |
++------+--------------------+---------+------+-------------+---------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select name,(select SUM(salary) from player where player.team_id=team.team_id) as Salary from team;
+ERROR 1054 (42S22): Unknown column 'team.team_id' in 'where clause'
+mysql> select name,(select SUM(salary) from player where player.team_id=team.id) as Salary from team;
++-------------------+-------------+
+| name              | Salary      |
++-------------------+-------------+
+| Manchester United | 10600000.00 |
+| Arsenal           |  9000000.00 |
+| Everton           |  4120000.00 |
+| Liverpool         |  6000000.00 |
+| Chelsea           |  7300000.00 |
+| Brentford         |        NULL |
+| Aston Villa       |        NULL |
+| Bercelona         | 26000000.00 |
+| Real Madrid       | 10000000.00 |
++-------------------+-------------+
+9 rows in set (0.07 sec)
+
+mysql> select * from Player where height<6;
++------+----------------+---------+------+------------+---------+--------+
+| id   | name           | jersyno | age  | salary     | team_id | height |
++------+----------------+---------+------+------------+---------+--------+
+|    4 | Eden Hazard    |      23 |   30 | 7000000.00 |       5 | 5.10   |
+|    5 | Mohamed Salah  |      17 |   26 | 6000000.00 |       4 | 5.8    |
+|    7 | Alexis Sanchez |      12 |   30 | 9000000.00 |       2 | 5.9    |
+|    8 | Gabriel Jesus  |      20 |   32 |  600000.00 |       1 | 5.10   |
+|   10 | Lucas Digne    |      12 |   30 |  120000.00 |       3 | 5.8    |
+|   11 | Marcos Alonso  |       3 |   30 |  300000.00 |       5 | 5.8    |
++------+----------------+---------+------+------------+---------+--------+
+6 rows in set (0.07 sec)
+
+mysql> select name,(select AVG(salary) from Player where player.team_id=team.id) as Average from team;
++-------------------+-----------------+
+| name              | Average         |
++-------------------+-----------------+
+| Manchester United |  5300000.000000 |
+| Arsenal           |  9000000.000000 |
+| Everton           |  2060000.000000 |
+| Liverpool         |  6000000.000000 |
+| Chelsea           |  3650000.000000 |
+| Brentford         |            NULL |
+| Aston Villa       |            NULL |
+| Bercelona         | 13000000.000000 |
+| Real Madrid       | 10000000.000000 |
++-------------------+-----------------+
+9 rows in set (0.02 sec)
+
+mysql> select name,salary from player where salary in(select min(salary) from player);
++-------------+-----------+
+| name        | salary    |
++-------------+-----------+
+| Lucas Digne | 120000.00 |
++-------------+-----------+
+1 row in set (0.16 sec)
+
+mysql> select name,salary from Player where salary in(select max(salary) from player);
++--------------+-------------+
+| name         | salary      |
++--------------+-------------+
+| Lionel Messi | 14000000.00 |
++--------------+-------------+
+1 row in set (0.02 sec)
+
+mysql> select * from Player where age<30 && salary>500000.00;
++------+---------------+---------+------+-------------+---------+--------+
+| id   | name          | jersyno | age  | salary      | team_id | height |
++------+---------------+---------+------+-------------+---------+--------+
+|    3 | Marcelo       |      13 |   27 | 10000000.00 |       9 | 6      |
+|    5 | Mohamed Salah |      17 |   26 |  6000000.00 |       4 | 5.8    |
++------+---------------+---------+------+-------------+---------+--------+
+2 rows in set, 1 warning (0.04 sec)
+
+mysql> select * from Player where age>30 && height>6;
++------+--------------+---------+------+-------------+---------+--------+
+| id   | name         | jersyno | age  | salary      | team_id | height |
++------+--------------+---------+------+-------------+---------+--------+
+|    2 | Lionel Messi |      10 |   35 | 14000000.00 |       8 | 6.5    |
+|    6 | David De Gra |       9 |   35 | 10000000.00 |       1 | 6.2    |
++------+--------------+---------+------+-------------+---------+--------+
+2 rows in set, 1 warning (0.00 sec)
+
+mysql>
